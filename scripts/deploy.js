@@ -22,6 +22,19 @@ async function main() {
       lockedAmount
     )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
   );
+
+  const MoneyPoolFactory = await hre.ethers.getContractFactory("MoneyPoolFactory");
+  const moneyPoolFactory = MoneyPoolFactory.deploy();
+  await moneyPoolFactory.deployed();
+
+  await moneyPoolFactory.createMoneyPool(10, 30);
+  const moneyPool = await moneyPoolFactory.moneyPools(0);
+  
+
+
+
+
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
