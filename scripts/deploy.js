@@ -32,7 +32,7 @@ async function main() {
     `MoneyPool factory deployed to ${moneyPoolFactory.address}`
   );
 
-  await moneyPoolFactory.createMoneyPool(10, 30);
+  //await moneyPoolFactory.createMoneyPool(10, 30);
 
 
 

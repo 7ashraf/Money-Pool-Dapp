@@ -1,39 +1,43 @@
 pragma solidity ^0.8.0;
 
 contract MoneyPool {
+
     uint public monthlyAmount; // monthly amount to be contributed by each member
     uint public poolAmount;
-    uint startDate;
-    uint endDate;
+    uint public startDate;
+    uint public endDate;
     uint public duration;
     address[] public members; // array of members in the money pool
     mapping(address => uint) public usersPriority;
     mapping(address => bool) public usersReceiveState;
     mapping(address => bool) public usersPayState;
     uint public maxUsersNumber;
+    address creator;
 
 
     uint public time = block.timestamp;
 
     
     // constructor to initialize the owner and monthly amount
-    constructor(uint _poolAmount, uint _monthlyAmount) {
+    constructor(address _creator, uint _poolAmount, uint _monthlyAmount) {
+        creator = _creator;
         monthlyAmount = _monthlyAmount;
         poolAmount = _poolAmount;
         maxUsersNumber = _poolAmount / _monthlyAmount;
-        duration = _poolAmount / _monthlyAmount;
+        duration = (_poolAmount / _monthlyAmount) *30*24*60*60;
+        //WRONG LOGIC, ADDS MONEY FACTORY
+        join();
         usersPriority[msg.sender] = block.timestamp;
+        startDate = block.timestamp;
+        endDate = startDate + duration;
+        
+
+
     }
     
     // function to deposit money into the money pool
     function deposit() public payable {
-        bool exists = false;
-        for (uint i = 0; i < members.length; i++) {
-        if (members[i] == msg.sender) {
-            exists = true;
-        }
-        }
-        require(exists, "User has not joined the pool");
+        require(isJoined(msg.sender), "User has not joined the pool");
         require(!usersPayState[msg.sender], "User already paid");
         require(msg.value == monthlyAmount, "Invalid deposit amount");
         usersPayState[msg.sender] = true;
@@ -56,6 +60,7 @@ contract MoneyPool {
     function withdraw() public {
         address toReceive = getToReceive();
         payable(toReceive).transfer(getBalance());
+        //CHECK IF TRANSACTION COMPLETED 
         usersReceiveState[toReceive] = true;
         for(uint i =0; i<members.length; i++){
             usersPayState[members[i]] = false;
@@ -74,17 +79,34 @@ contract MoneyPool {
     }
 
     function join() public {
+        if(members.length == 0){
+            members.push(creator);
+            usersPriority[creator] = block.timestamp;
+            usersReceiveState[creator] = false;
+            return;
+        }
         require(members.length < maxUsersNumber, "Pool full");
-        bool exists = false;
-        for (uint i = 0; i < members.length; i++) {
-        if (members[i] == msg.sender) {
-            exists = true;
-        }
-        }
-        require(!exists, "User already exists");
+        require(!isJoined(msg.sender), "User already exists");
         members.push(msg.sender);
         usersPriority[msg.sender] = block.timestamp;
         usersReceiveState[msg.sender] = false;
+    }
+
+    function isJoined(address _address) public view returns(bool){
+        for(uint i =0; i<members.length; i++){
+            if(members[i] == _address){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getUserPayState(address _address) public view returns(bool){
+        return usersPayState[_address];
+    }
+
+    function getReceivalDate(address _address) public view returns(uint){
+        return 0;
     }
   
 }
@@ -92,12 +114,10 @@ contract MoneyPool {
 contract MoneyPoolFactory {
     mapping(address => MoneyPool[]) public userMoneyPools;
     MoneyPool[] public moneyPools ;
-    mapping(address => MoneyPool) public moneyPoolsMapping;
-
     
     // function to create a new money pool for a user
-    function createMoneyPool(uint _poolTotal, uint _monthlyAmount) public {
-        MoneyPool newMoneyPool = new MoneyPool(_poolTotal, _monthlyAmount);
+    function createMoneyPool(address _creator, uint _poolTotal, uint _monthlyAmount) public {
+        MoneyPool newMoneyPool = new MoneyPool(_creator,_poolTotal, _monthlyAmount);
         userMoneyPools[msg.sender].push(newMoneyPool);
         moneyPools.push(newMoneyPool);
     }
@@ -107,13 +127,11 @@ contract MoneyPoolFactory {
         return userMoneyPools[msg.sender].length;
     }
 
-    function getUserMoneyPools(address _user)
-        public
-        view
-        returns (MoneyPool[] memory coll)
-    {
-        
+    function getUserMoneyPools(address _user) public view returns (MoneyPool[] memory coll){  
         return userMoneyPools[_user];
     }
     
+    function getAllMoneyPools() public view returns (MoneyPool[] memory coll){
+        return moneyPools;
+    }
 }

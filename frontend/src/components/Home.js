@@ -50,7 +50,7 @@ const Home =()=>{
 
     const createMoneyPool = async ()=>{
         const moneyPoolFactory = getContract()
-        const transactionHash = await moneyPoolFactory.createMoneyPool(30, 10)
+        const transactionHash = await moneyPoolFactory.createMoneyPool(currentAccount, 30, 10)
         console.log(`loading - ${transactionHash.hash}`);
         await transactionHash.wait();
         console.log(`money pool creation Success - ${transactionHash.hash}`)
