@@ -17,19 +17,22 @@ async function main() {
 
   await lock.deployed();
 
-  console.log(
-    `Lock with ${ethers.utils.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  //console.log(
+//    `Lock with ${ethers.utils.formatEther(
+ ///     lockedAmount
+  //  )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+ // );
 
   const MoneyPoolFactory = await hre.ethers.getContractFactory("MoneyPoolFactory");
-  const moneyPoolFactory = MoneyPoolFactory.deploy();
+  const MoneyPool = await hre.ethers.getContractFactory('MoneyPool');
+
+  const moneyPoolFactory = await MoneyPoolFactory.deploy();
   await moneyPoolFactory.deployed();
+  console.log(
+    `MoneyPool factory deployed to ${moneyPoolFactory.address}`
+  );
 
   await moneyPoolFactory.createMoneyPool(10, 30);
-  const moneyPool = await moneyPoolFactory.moneyPools(0);
-  
 
 
 
