@@ -31,7 +31,7 @@ async function main() {
   console.log(
     `MoneyPool factory deployed to ${moneyPoolFactory.address}`
   );
-
+  
   //await moneyPoolFactory.createMoneyPool(10, 30);
 
 

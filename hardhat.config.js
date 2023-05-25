@@ -6,4 +6,6 @@ module.exports = {
   paths: {
     artifacts: "./frontend/src/utils/artifacts/"
   },
+  gas: 2100000,
+   gasPrice: 8000000000,
 };

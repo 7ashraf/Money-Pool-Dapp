@@ -1,6 +1,8 @@
 pragma solidity ^0.8.0;
 
 contract MoneyPool {
+    MoneyPoolFactory public factory;
+
 
     uint public monthlyAmount; // monthly amount to be contributed by each member
     uint public poolAmount;
@@ -30,13 +32,11 @@ contract MoneyPool {
         duration = (_poolAmount / _monthlyAmount) *30*24*60*60;
         creator = _creator;
 
-        //WRONG LOGIC, ADDS MONEY FACTORY
         join();
-        usersPriority[msg.sender] = block.timestamp;
+        usersPriority[_creator] = block.timestamp;
         startDate = block.timestamp;
         endDate = startDate + duration;
-
-        
+        factory = MoneyPoolFactory(msg.sender);
 
 
     }
@@ -91,12 +91,13 @@ contract MoneyPool {
             usersReceiveState[creator] = false;
             return;
         }
+        //msg.sender is user
         require(members.length < maxUsersNumber, "Pool full");
         require(!isJoined(msg.sender), "User already exists");
         members.push(msg.sender);
         usersPriority[msg.sender] = block.timestamp;
         usersReceiveState[msg.sender] = false;
-        //MoneyPoolFactory.userMoneyPools[msg.sender].push(this);
+        factory.pushUserMoneyPool(msg.sender);
     }
 
     function isJoined(address _address) public view returns(bool){
@@ -144,5 +145,9 @@ contract MoneyPoolFactory {
     
     function getAllMoneyPools() public view returns (MoneyPool[] memory coll){
         return moneyPools;
+    }
+    function pushUserMoneyPool(address user) public{
+        //in this case msg.sender is the moneypool it self
+        userMoneyPools[user].push(MoneyPool(msg.sender));
     }
 }

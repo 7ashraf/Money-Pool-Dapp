@@ -13,7 +13,6 @@ const  MoneyPool = () =>{
     const [currentAccount, setCurrentAccount] = useState(null)
     const location = useLocation()
     const [moneyPool, setMoneyPool] = useState(null)
-    const factoryAdress = '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'
     
     const [moneyPoolInfo, setMoneyPoolInfo] = useState({})
 
@@ -101,9 +100,8 @@ const  MoneyPool = () =>{
         try {
             const provider = new ethers.providers.Web3Provider(ethereum);
             const signer = provider.getSigner()
-            const factory = new ethers.Contract(factoryAdress, moneyPoolABI, signer)
-            //await factory.userMoneyPools[currentAccount].push(moneyPool)
             await moneyPool.join()
+           
             
         } catch (error) {
             console.log(error)
