@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { ethers } from "ethers";
-import { contractABI, constractAdress } from "../utils/cons";
+import { factoryABI, factoryAddress } from "../utils/cons";
 import { Link } from "react-router-dom";
 
 
@@ -29,22 +29,19 @@ const Home =()=>{
     const getContract = () => {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner()
-        const moneyPoolFactoryContract = new ethers.Contract(constractAdress, contractABI, signer)
+        const moneyPoolFactoryContract = new ethers.Contract(factoryAddress, factoryABI, signer)
         //console.log(moneyPoolFactotyContract)
         return moneyPoolFactoryContract;
     }
     const getUserMoneyPools = async() => {
         try {
             const moneyPoolFactory =  getContract()
+            //console.log(moneyPoolFactory)
             const userMoneyPools = await moneyPoolFactory.getUserMoneyPools(currentAccount)
             //console.log(userMoneyPools)
             setUserMoneyPools(userMoneyPools)
-            // for(let i =0; i<userMoneyPools.length; i++){
-            //     setUserMoneyPools = userMoneyPools[i]
-            // }
-            
         } catch (error) {
-            console.log(error)
+            console.log(error.message)
         }
     }
 
@@ -57,14 +54,22 @@ const Home =()=>{
     } 
 
     const getAllMoneyPools = async()=>{
-
+        try {
+            const contract = getContract()
+            const pools = await contract.getAllMoneyPools()
+            setAllMoneyPools(pools)
+        } catch (error) {
+            console.log(error)
+        } 
+        
     }
 
     useEffect(
         () => {
             connectWallet()
             getUserMoneyPools()
-          //console.log("dependency1 and dependency2", dependency1, dependency2);
+            getAllMoneyPools()
+//          console.log(userMoneyPools)
         },
         [currentAccount, userMoneyPools]
       );
@@ -75,34 +80,33 @@ const Home =()=>{
         <div>
             <h1>Welcome to Money Pool d-app</h1>
             {currentAccount && <h2>address: {currentAccount}</h2>}
-            {!currentAccount &&<div> <button type="button" class="btn btn-primary" onClick={connectWallet}>Connect wallet</button>
+            {!currentAccount &&<div> <button type="button" className="btn btn-primary" onClick={connectWallet}>Connect wallet</button>
             </div>}
            
             {currentAccount && 
                 <div>
                     <h2>My Money pools</h2>
                     
-                        <ul class="list-group list-group-flush">
+                        <ul className="list-group list-group-flush">
                         {userMoneyPools.length ? userMoneyPools.map((moneyPool, i)=>
-                            <li class="list-group-item" key={moneyPool}>
-                                <Link to={`money-pool/${moneyPool}`}>{moneyPool}</Link>
+                            <li className="list-group-item" key={moneyPool}>
+                                <Link to={`money-pool/${moneyPool}`} state={currentAccount}>{moneyPool}</Link>
                             </li>
-                        ) :  <li class="list-group-item">No Money Pools</li>}
+                        ) :  <li className="list-group-item">No Money Pools</li>}
                          </ul>
-                         <button type="button" class="btn btn-primary" onClick={getUserMoneyPools}>get userMoneyPools</button>   
-                         <button type="button" class="btn btn-primary" onClick={createMoneyPool}>createMoneyPool</button>                    
+                         <button type="button" className="btn btn-primary" onClick={createMoneyPool}>createMoneyPool</button>                    
                     
 
                 </div>}
                 
                 <div>
                     <h2>All Money Pools</h2>
-                    <ul class="list-group list-group-flush">
+                    <ul className="list-group list-group-flush">
                         {allMoneyPools.length ? allMoneyPools.map((moneyPool, i)=>
-                            <li class="list-group-item" key={moneyPool}>
-                                <Link to={`money-pool/${moneyPool}`}>{moneyPool}</Link>
+                            <li className="list-group-item" key={moneyPool}>
+                                <Link to={`money-pool/${moneyPool}`} state={currentAccount}>{moneyPool}</Link>
                             </li>
-                        ) :  <li class="list-group-item">No Money Pools</li>}
+                        ) :  <li className="list-group-item">No Money Pools</li>}
                          </ul>
                 </div>
         </div>

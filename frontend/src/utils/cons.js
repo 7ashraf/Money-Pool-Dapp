@@ -1,6 +1,6 @@
-import abi from './MoneyPoolFactory.json'
-import abi2 from './MoneyPool.json'
-export const contractABI = abi.abi;
-export const moneyPoolABI = abi2.abi;
+import factory from './artifacts/contracts/MoneyPoolFactory.sol/MoneyPoolFactory.json'
+import moneyPool from './artifacts/contracts/MoneyPoolFactory.sol/MoneyPool.json'
+export const factoryABI = factory.abi;
+export const moneyPoolABI = moneyPool.abi;
 
-export const constractAdress = '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE';
+export const factoryAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';

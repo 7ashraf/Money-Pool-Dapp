@@ -14,22 +14,28 @@ contract MoneyPool {
     uint public maxUsersNumber;
     address creator;
 
+    //to be implemented
+    bool moneyPoolState;
+    uint reqruiredUsersNumber;
+
 
     uint public time = block.timestamp;
 
     
     // constructor to initialize the owner and monthly amount
     constructor(address _creator, uint _poolAmount, uint _monthlyAmount) {
-        creator = _creator;
         monthlyAmount = _monthlyAmount;
         poolAmount = _poolAmount;
         maxUsersNumber = _poolAmount / _monthlyAmount;
         duration = (_poolAmount / _monthlyAmount) *30*24*60*60;
+        creator = _creator;
+
         //WRONG LOGIC, ADDS MONEY FACTORY
         join();
         usersPriority[msg.sender] = block.timestamp;
         startDate = block.timestamp;
         endDate = startDate + duration;
+
         
 
 
@@ -90,6 +96,7 @@ contract MoneyPool {
         members.push(msg.sender);
         usersPriority[msg.sender] = block.timestamp;
         usersReceiveState[msg.sender] = false;
+        //MoneyPoolFactory.userMoneyPools[msg.sender].push(this);
     }
 
     function isJoined(address _address) public view returns(bool){
@@ -107,6 +114,10 @@ contract MoneyPool {
 
     function getReceivalDate(address _address) public view returns(uint){
         return 0;
+    }
+
+    function getMembers() public view returns(address[] memory coll){
+        return members;
     }
   
 }
